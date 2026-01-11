@@ -15,9 +15,10 @@ namespace iZiTA
     //</editor-fold>
     /**
      * iZiTA::Array_Library<br>
-     * Script version: 202601.0.0.15<br>
-     * PHP Version: 8.5<br>
-     * <b>Details</b>: Array converting, checking library.<br>
+     * Script version: <b>202601.0.0.16</b><br>
+     * PHP Version: <b>8.5</b><br>
+     * <b>Info</b>:<br>
+     * iZiTA::Array_Library is an Array converting, checking library.<br>
      * @package iZiTA::Array_Library
      * @author : TheTimeAuthority
      */
@@ -47,9 +48,9 @@ namespace iZiTA
          * @param array $Array <p> The array to process.
          * @return array Returns an array of the last elements.
          */
-        Final Function Array_Get_Last(array $Array): array
+        Final Function Array_Get_Last(array $Array, Int $MaxDepth = 5): array
         {
-            $Array_To_Last = ($this->Array_To_Last($Array) ?? '') ?: '';
+            $Array_To_Last = ($this->Array_To_Last($Array, MaxDepth: $MaxDepth) ?? '') ?: '';
             if(is_array($Array_To_Last) === True)
             {
                 return $Array_To_Last;
@@ -136,26 +137,29 @@ namespace iZiTA
             return $Result;
         }
         /**
-         * From the array get all the last elements<br>.
-         * @param array $Array <p> The array to process</p>.
+         * Recursively get all array last elements until $MaxDepth.
+         * @param array $Array <p> The array to process.</p>
+         * @param array &$result <p> Leave empty.</p>
+         * @param Int $Depth <p> Is the depth you are inside the array.</p>
+         * @param Int $MaxDepth <p> Is the maximum depth allowed to dive inside the array.<br>
+         * <i>> Default to 5.</i></p>
          * @return array Returns an array of the last elements.
          */
-        Private Function Array_To_Last(array $Array): array
+        Private Function Array_To_Last(array $Array, array &$result = [], Int $Depth = 0, Int $MaxDepth = 5): array
         {
-            $result = [];
-            foreach($Array as $Array_Branch)
+            $Depth+=1;
+            if($Depth > $MaxDepth)
             {
-                $Get_Array_Last = $Array_Branch;
-                while(is_array($Get_Array_Last))
+                return [''];
+            }
+            foreach($Array as $Script_Depth => $Sub_Script_Depth)
+            {
+                if(is_array($Sub_Script_Depth))
                 {
-                    $Get_Array_Last = end($Get_Array_Last);
-                }
-                if(is_string($Get_Array_Last) === True)
-                {
-                    $result[] = $Get_Array_Last;
+                    $this->Array_To_Last($Sub_Script_Depth, $result, $Depth, $MaxDepth);
                 }else
                 {
-                    $result[] = 'ERROR';
+                    $result[] = $Sub_Script_Depth;
                 }
             }
             return $result;
