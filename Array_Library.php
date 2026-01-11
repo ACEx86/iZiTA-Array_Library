@@ -15,7 +15,7 @@ namespace iZiTA
     //</editor-fold>
     /**
      * iZiTA::Array_Library<br>
-     * Script version: <b>202601.0.0.16</b><br>
+     * Script version: <b>202601.0.0.17</b><br>
      * PHP Version: <b>8.5</b><br>
      * <b>Info</b>:<br>
      * iZiTA::Array_Library is an Array converting, checking library.<br>
@@ -36,7 +36,7 @@ namespace iZiTA
          */
         Final Function Array_To_String(array $Array, String $Separator = ''): String
         {
-            $Array_To_String = ($this->Array_Recursive_Get_Flat($Array, $Separator) ?? '') ?: '';
+            $Array_To_String = ($this->Array_Recursively_Get_Flat($Array, $Separator) ?? '') ?: '';
             if(is_string($Array_To_String) === True)
             {
                 return $Array_To_String;
@@ -50,7 +50,7 @@ namespace iZiTA
          */
         Final Function Array_Get_Last(array $Array, Int $MaxDepth = 5): array
         {
-            $Array_To_Last = ($this->Array_To_Last($Array, MaxDepth: $MaxDepth) ?? '') ?: '';
+            $Array_To_Last = ($this->Array_Recursively_Get_Last($Array, MaxDepth: $MaxDepth) ?? '') ?: '';
             if(is_array($Array_To_Last) === True)
             {
                 return $Array_To_Last;
@@ -72,7 +72,7 @@ namespace iZiTA
          * <i>> Defaults to an empty string. Do not change.</i></p>
          * @return array|String
          */
-        Private Function Array_Recursive_Get_Flat(Array $Array, String $Separator = '', Bool $As_String = True, String $Prefix = ''): Array|String
+        Private Function Array_Recursively_Get_Flat(Array $Array, String $Separator = '', Bool $As_String = True, String $Prefix = ''): Array|String
         {#
             if($As_String === True)
             {# Return the result as string
@@ -100,7 +100,7 @@ namespace iZiTA
                 {# Recursively process nested arrays.
                     if($As_String === True)
                     {# Flatten the result when requested as a string
-                        $nestedResult = $this->Array_Recursive_Get_Flat($Value, $Separator, True, $Current_Key);
+                        $nestedResult = $this->Array_Recursively_Get_Flat($Value, $Separator, True, $Current_Key);
                         if(is_array($nestedResult) === True)
                         {# On error empty nesterResult
                             $nestedResult = '';
@@ -112,7 +112,7 @@ namespace iZiTA
                         }
                     }else
                     {
-                        $nestedResult = $this->Array_Recursive_Get_Flat($Value, $Separator, False, $Current_Key);
+                        $nestedResult = $this->Array_Recursively_Get_Flat($Value, $Separator, False, $Current_Key);
                         $Result[$Key] = $nestedResult;
                     }
                 }else
@@ -145,7 +145,7 @@ namespace iZiTA
          * <i>> Default to 5.</i></p>
          * @return array Returns an array of the last elements.
          */
-        Private Function Array_To_Last(array $Array, array &$result = [], Int $Depth = 0, Int $MaxDepth = 5): array
+        Private Function Array_Recursively_Get_Last(array $Array, array &$result = [], Int $Depth = 0, Int $MaxDepth = 5): array
         {
             $Depth+=1;
             if($Depth > $MaxDepth)
@@ -156,7 +156,7 @@ namespace iZiTA
             {
                 if(is_array($Sub_Script_Depth))
                 {
-                    $this->Array_To_Last($Sub_Script_Depth, $result, $Depth, $MaxDepth);
+                    $this->Array_Recursively_Get_Last($Sub_Script_Depth, $result, $Depth, $MaxDepth);
                 }else
                 {
                     $result[] = $Sub_Script_Depth;
