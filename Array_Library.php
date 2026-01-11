@@ -161,15 +161,12 @@ namespace iZiTA
             }
             foreach($Array as $Entry)
             {
-                if(is_array($Entry))
+                if(is_array($Entry) === True)
                 {
-                    $this->Array_Recursively_Get_Last($Entry, $result, $Depth, $MaxDepth);
+                    $this->Array_Recursively_Get_Last($Entry, $result, $Depth, $MaxDepth, $Only_From_MaxDepth);
                 }else
                 {
-                    if($Only_From_MaxDepth === True and $Depth === $MaxDepth)
-                    {
-                        $result[] = $Entry;
-                    }elseif($Only_From_MaxDepth === False)
+                    if(($Only_From_MaxDepth === True and $Depth === $MaxDepth) or $Only_From_MaxDepth === False)
                     {
                         $result[] = $Entry;
                     }
