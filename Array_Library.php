@@ -15,7 +15,7 @@ namespace iZiTA
     //</editor-fold>
     /**
      * iZiTA::Array_Library<br>
-     * Script version: <b>202601.0.0.17</b><br>
+     * Script version: <b>202601.0.0.18</b><br>
      * PHP Version: <b>8.5</b><br>
      * <b>Info</b>:<br>
      * iZiTA::Array_Library is an Array converting, checking library.<br>
@@ -44,13 +44,17 @@ namespace iZiTA
             return '';
         }
         /**
-         * Return the last as array elements as array.
-         * @param array $Array <p> The array to process.
+         * Return the last array elements as array.
+         * @param array $Array<p> The array to process.</p>
+         * @param Int $MaxDepth<p> The Maximum Depth to dive inside the array.<br>
+         * <i>> Default to 5.</i></p>
+         * @param Bool $Only_From_MaxDepth<p> Only get the elements of the specified last depth.<br>
+         * <i>> Defaults to True.</i></p>
          * @return array Returns an array of the last elements.
          */
-        Final Function Array_Get_Last(array $Array, Int $MaxDepth = 5): array
+        Final Function Array_Get_Last(array $Array, Int $MaxDepth = 5, Bool $Only_From_MaxDepth = True): array
         {
-            $Array_To_Last = ($this->Array_Recursively_Get_Last($Array, MaxDepth: $MaxDepth) ?? '') ?: '';
+            $Array_To_Last = ($this->Array_Recursively_Get_Last($Array, MaxDepth: $MaxDepth, Only_From_MaxDepth: $Only_From_MaxDepth) ?? '') ?: '';
             if(is_array($Array_To_Last) === True)
             {
                 return $Array_To_Last;
@@ -138,28 +142,37 @@ namespace iZiTA
         }
         /**
          * Recursively get all array last elements until $MaxDepth.
-         * @param array $Array <p> The array to process.</p>
-         * @param array &$result <p> Leave empty.</p>
-         * @param Int $Depth <p> Is the depth you are inside the array.</p>
-         * @param Int $MaxDepth <p> Is the maximum depth allowed to dive inside the array.<br>
+         * @param array $Array<p> The array to process.</p>
+         * @param array &$result<p> Leave empty.</p>
+         * @param Int $Depth<p> Is the depth you are inside the array.<br>
+         * Leave empty.</p>
+         * @param Int $MaxDepth<p> Is the maximum depth allowed to dive inside the array.<br>
          * <i>> Default to 5.</i></p>
+         * @param Bool $Only_From_MaxDepth<p> Only get the elements of the specified last depth.<br>
+         * <i>> Defaults to False.</i></p>
          * @return array Returns an array of the last elements.
          */
-        Private Function Array_Recursively_Get_Last(array $Array, array &$result = [], Int $Depth = 0, Int $MaxDepth = 5): array
+        Private Function Array_Recursively_Get_Last(array $Array, array &$result = [], Int $Depth = 0, Int $MaxDepth = 5, Bool $Only_From_MaxDepth = False): array
         {
             $Depth+=1;
             if($Depth > $MaxDepth)
             {
                 return [''];
             }
-            foreach($Array as $Script_Depth => $Sub_Script_Depth)
+            foreach($Array as $Entry)
             {
-                if(is_array($Sub_Script_Depth))
+                if(is_array($Entry))
                 {
-                    $this->Array_Recursively_Get_Last($Sub_Script_Depth, $result, $Depth, $MaxDepth);
+                    $this->Array_Recursively_Get_Last($Entry, $result, $Depth, $MaxDepth);
                 }else
                 {
-                    $result[] = $Sub_Script_Depth;
+                    if($Only_From_MaxDepth === True and $Depth === $MaxDepth)
+                    {
+                        $result[] = $Entry;
+                    }elseif($Only_From_MaxDepth === False)
+                    {
+                        $result[] = $Entry;
+                    }
                 }
             }
             return $result;
