@@ -15,7 +15,7 @@ namespace iZiTA
     //</editor-fold>
     /**
      * iZiTA::Array_Library<br>
-     * Script version: <b>202601.0.0.18</b><br>
+     * Script version: <b>202601.0.0.20</b><br>
      * PHP Version: <b>8.5</b><br>
      * <b>Info</b>:<br>
      * iZiTA::Array_Library is an Array converting, checking library.<br>
@@ -54,7 +54,7 @@ namespace iZiTA
          */
         Final Function Array_Get_Last(array $Array, Int $MaxDepth = 5, Bool $Only_From_MaxDepth = True): array
         {
-            $Array_To_Last = ($this->Array_Recursively_Get_Last($Array, MaxDepth: $MaxDepth, Only_From_MaxDepth: $Only_From_MaxDepth) ?? '') ?: '';
+            $Array_To_Last = ($this->Array_Recursively_Make_Last($Array, MaxDepth: $MaxDepth, Only_From_MaxDepth: $Only_From_MaxDepth) ?? '') ?: '';
             if(is_array($Array_To_Last) === True)
             {
                 return $Array_To_Last;
@@ -76,7 +76,7 @@ namespace iZiTA
          * <i>> Defaults to an empty string. Do not change.</i></p>
          * @return array|String
          */
-        Private Function Array_Recursively_Get_Flat(Array $Array, String $Separator = '', Bool $As_String = True, String $Prefix = ''): Array|String
+        Private Function Array_Recursively_Get_Flat(array $Array, String $Separator = '', Bool $As_String = True, String $Prefix = ''): array|String
         {#
             if($As_String === True)
             {# Return the result as string
@@ -141,18 +141,16 @@ namespace iZiTA
             return $Result;
         }
         /**
-         * Recursively get all array last elements until $MaxDepth.
+         * Recursively get all array last elements.
          * @param array $Array<p> The array to process.</p>
-         * @param array &$result<p> Leave empty.</p>
-         * @param Int $Depth<p> Is the depth you are inside the array.<br>
-         * Leave empty.</p>
-         * @param Int $MaxDepth<p> Is the maximum depth allowed to dive inside the array.<br>
-         * <i>> Default to 5.</i></p>
-         * @param Bool $Only_From_MaxDepth<p> Only get the elements of the specified last depth.<br>
-         * <i>> Defaults to False.</i></p>
-         * @return array Returns an array of the last elements.
+         * @param array $Result <b>(Leave empty)</b>
+         * @param Int $Depth <b>(Leave empty)</b><p> Is the depth you are inside the array.</p>
+         * @param Int $MaxDepth (Defaults to <b>5.</b>)<p> Is the maximum depth allowed to dive inside the array.<br>
+         * @param Bool $Only_From_MaxDepth (Defaults to <b>False</b>.)<p> Only get elements as last elements if they come from the specified Max Depth.</p>
+         * @param Bool $With_Dimension (Defaults to <b>False</b>.)<p> When maximum depth is reached and more dimensions exist return them as last element.</p>
+         * @return array Returns an array or a multidimensional array of the last elements or an empty array on failure.
          */
-        Private Function Array_Recursively_Get_Last(array $Array, array &$result = [], Int $Depth = 0, Int $MaxDepth = 5, Bool $Only_From_MaxDepth = False): array
+        Private Function Array_Recursively_Make_Last(array $Array, array &$Result = [], Int $Depth = 0, Int $MaxDepth = 5, Bool $Only_From_MaxDepth = False, Bool $With_Dimension = False): array
         {
             $Depth+=1;
             if($Depth > $MaxDepth)
@@ -163,16 +161,22 @@ namespace iZiTA
             {
                 if(is_array($Entry) === True)
                 {
-                    $this->Array_Recursively_Get_Last($Entry, $result, $Depth, $MaxDepth, $Only_From_MaxDepth);
+                    if($Depth != $MaxDepth)
+                    {
+                        $this->Array_Recursively_Make_Last($Entry, $Result, $Depth, $MaxDepth, $Only_From_MaxDepth, $With_Dimension);
+                    }elseif($With_Dimension === True)
+                    {
+                        $Result[] = $Entry;
+                    }
                 }else
                 {
                     if(($Only_From_MaxDepth === True and $Depth === $MaxDepth) or $Only_From_MaxDepth === False)
                     {
-                        $result[] = $Entry;
+                        $Result[] = $Entry;
                     }
                 }
             }
-            return $result;
+            return $Result;
         }
         //</editor-fold>
     }
