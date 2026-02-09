@@ -15,7 +15,7 @@ namespace iZiTA
     //</editor-fold>
     /**
      * iZiTA::Array_Library<br>
-     * Script version: <b>202601.0.0.20</b><br>
+     * Script version: <b>202602.0.0.21</b><br>
      * PHP Version: <b>8.5</b><br>
      * <b>Info</b>:<br>
      * iZiTA::Array_Library is an Array converting, checking library.<br>
@@ -52,9 +52,9 @@ namespace iZiTA
          * <i>> Defaults to True.</i></p>
          * @return array Returns an array of the last elements.
          */
-        Final Function Array_Get_Last(array $Array, Int $MaxDepth = 5, Bool $Only_From_MaxDepth = True): array
+        Final Function Array_Get_Last(array $Array, Int $MaxDepth = 5, Bool $Only_From_MaxDepth = True, Bool $Flat_Un_dimensionalize = False): array
         {
-            $Array_To_Last = ($this->Array_Recursively_Make_Last($Array, MaxDepth: $MaxDepth, Only_From_MaxDepth: $Only_From_MaxDepth) ?? '') ?: '';
+            $Array_To_Last = ($this->Array_Recursively_Make_Until($Array, MaxDepth: $MaxDepth, Only_From_MaxDepth: $Only_From_MaxDepth, Flat_Un_dimensionalize: $Flat_Un_dimensionalize) ?? '') ?: '';
             if(is_array($Array_To_Last) === True)
             {
                 return $Array_To_Last;
@@ -141,16 +141,17 @@ namespace iZiTA
             return $Result;
         }
         /**
-         * Recursively get all array last elements.
+         * Recursively make array as last elements.
          * @param array $Array<p> The array to process.</p>
          * @param array $Result <b>(Leave empty)</b>
          * @param Int $Depth <b>(Leave empty)</b><p> Is the depth you are inside the array.</p>
          * @param Int $MaxDepth (Defaults to <b>5.</b>)<p> Is the maximum depth allowed to dive inside the array.<br>
          * @param Bool $Only_From_MaxDepth (Defaults to <b>False</b>.)<p> Only get elements as last elements if they come from the specified Max Depth.</p>
          * @param Bool $With_Dimension (Defaults to <b>False</b>.)<p> When maximum depth is reached and more dimensions exist return them as last element.</p>
+         * @param Bool $Flat_Un_dimensionalize (Defaults to <b>False</b>.)<p> Until maximum depth is reached make dimensions flat array.</p>
          * @return array Returns an array or a multidimensional array of the last elements or an empty array on failure.
          */
-        Private Function Array_Recursively_Make_Last(array $Array, array &$Result = [], Int $Depth = 0, Int $MaxDepth = 5, Bool $Only_From_MaxDepth = False, Bool $With_Dimension = False): array
+        Private Function Array_Recursively_Make_Until(array $Array, array &$Result = [], Int $Depth = 0, Int $MaxDepth = 5, Bool $Only_From_MaxDepth = False, Bool $With_Dimension = False, Bool $Flat_Un_dimensionalize = False): array
         {
             $Depth+=1;
             if($Depth > $MaxDepth)
@@ -163,7 +164,11 @@ namespace iZiTA
                 {
                     if($Depth != $MaxDepth)
                     {
-                        $this->Array_Recursively_Make_Last($Entry, $Result, $Depth, $MaxDepth, $Only_From_MaxDepth, $With_Dimension);
+                        if($Flat_Un_dimensionalize === True)
+                        {
+                            $Result[] = (key($Entry) ?? '');
+                        }
+                        $this->Array_Recursively_Make_Until($Entry, $Result, $Depth, $MaxDepth, $Only_From_MaxDepth, $With_Dimension, $Flat_Un_dimensionalize);
                     }elseif($With_Dimension === True)
                     {
                         $Result[] = $Entry;
