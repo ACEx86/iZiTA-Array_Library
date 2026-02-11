@@ -179,6 +179,22 @@ namespace iZiTA
                             }
                         }
                         $this->Array_Recursively_Make_Flat_On_Go(Array: $Entry, Depth: $Depth, MaxDepth: $MaxDepth, Only_From_MaxDepth: $Only_From_MaxDepth, Return_Max_With_Dimension: $Return_Max_With_Dimension, Flat_Un_dimensionalize: $Flat_Un_dimensionalize, F_U_d_make_empty: $F_U_d_make_empty, F_U_d_recursion_include_path: $F_U_d_recursion_include_path, Verification: $Verification, Result: $Result, FUDArray: $Previous_Array);
+                    }elseif($Only_From_MaxDepth === False)
+                    {
+                        if($Flat_Un_dimensionalize === True)
+                        {
+                            if($F_U_d_recursion_include_path === True)
+                            {
+                                foreach($Previous_Array as $F_U_d_include)
+                                {
+                                    $Result[] = $F_U_d_include;
+                                }
+                            }elseif(($Index) !== '' or $F_U_d_make_empty === True)
+                            {
+                                $Result[] = (string)$Index;
+                            }
+                        }
+                        $Result[] = $Entry;
                     }
                 }elseif($Depth === $MaxDepth)
                 {
@@ -195,7 +211,13 @@ namespace iZiTA
                             $Result[] = (string)$Index;
                         }
                     }
-                    if(($Only_From_MaxDepth === True and $Depth === $MaxDepth) or $Only_From_MaxDepth === False or $Flat_Un_dimensionalize === True)
+                    if(is_array($Entry) === True)
+                    {
+                        if($Return_Max_With_Dimension === True)
+                        {
+                            $Result[] = $Entry;
+                        }
+                    }elseif(is_string($Entry) === True)
                     {
                         $Result[] = $Entry;
                     }
