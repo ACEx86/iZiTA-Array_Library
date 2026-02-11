@@ -194,7 +194,10 @@ namespace iZiTA
                                 $Result[] = (string)$Index;
                             }
                         }
-                        $Result[] = $Entry;
+                        if(is_string($Entry) === True)
+                        {
+                            $Result[] = $Entry;
+                        }
                     }
                 }elseif($Depth === $MaxDepth)
                 {
@@ -211,10 +214,7 @@ namespace iZiTA
                             $Result[] = (string)$Index;
                         }
                     }
-                    if(is_array($Entry) === True and $Return_Max_With_Dimension === True)
-                    {
-                        $Result[] = $Entry;
-                    }elseif(is_string($Entry) === True)
+                    if((is_array($Entry) === True and $Return_Max_With_Dimension === True) or is_string($Entry) === True)
                     {
                         $Result[] = $Entry;
                     }
