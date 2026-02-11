@@ -15,7 +15,7 @@ namespace iZiTA
     //</editor-fold>
     /**
      * iZiTA::Array_Library<br>
-     * Script version: <b>202602.0.0.24</b><br>
+     * Script version: <b>202602.0.0.25</b><br>
      * PHP Version: <b>8.5</b><br>
      * <b>Info</b>:<br>
      * iZiTA::Array_Library is an Array converting, checking library.<br>
@@ -52,9 +52,9 @@ namespace iZiTA
          * <i>> Defaults to True.</i></p>
          * @return array Returns an array of the last elements.
          */
-        Final Function Array_Get_Last(array $Array, Int $MaxDepth = 5, Bool $Only_From_MaxDepth = True, Bool $Flat_Un_dimensionalize = False, Bool $Verification = False): array
+        Final Function Array_Get_Last(array $Array, Int $MaxDepth = 5, Bool $Only_From_MaxDepth = False, Bool $Return_Max_With_Dimension = False, Bool $Flat_Un_dimensionalize = False, Bool $F_U_d_recursion_include_path = False, Bool $F_U_d_make_empty = False, Bool $Verification = False): array
         {
-            $Array_To_Last = ($this->Array_Recursively_Make_Flat_On_Go($Array, MaxDepth: $MaxDepth, Only_From_MaxDepth: $Only_From_MaxDepth, Flat_Un_dimensionalize: $Flat_Un_dimensionalize, Verification: $Verification) ?? '') ?: '';
+            $Array_To_Last = ($this->Array_Recursively_Make_Flat_On_Go($Array, MaxDepth: $MaxDepth, Only_From_MaxDepth: $Only_From_MaxDepth, Return_Max_With_Dimension: $Return_Max_With_Dimension,  Flat_Un_dimensionalize: $Flat_Un_dimensionalize, F_U_d_recursion_include_path: $F_U_d_recursion_include_path, F_U_d_make_empty: $F_U_d_make_empty, Verification: $Verification) ?? '') ?: '';
             if(is_array($Array_To_Last) === True)
             {
                 return $Array_To_Last;
@@ -149,32 +149,35 @@ namespace iZiTA
          * @param Bool $Only_From_MaxDepth (Defaults to <b>False</b>.)<p> Only get elements as last elements if it's from specified Max Depth.</p>
          * @param Bool $Return_Max_With_Dimension (Defaults to <b>False</b>.)<p> When maximum depth is reached and more dimensions exist return them as last element.</p>
          * @param Bool $Flat_Un_dimensionalize (Defaults to <b>False</b>.)<p> Until maximum depth is reached make dimensions(array) flat array.</p>
-         * @param Bool $F_U_d_make_empty (Defaults to <b>False</b>.)<p> If a dimension is empty include it.</p>
+         * @param Bool $F_U_d_recursion_include_path (Defaults to <b>False</b>.)<p> Include full previous path in each dimension.</p>
+         * @param Bool $F_U_d_make_empty (Defaults to <b>False</b>.)<p> If the element is empty include it.</p>
+         * TODO:@param String $Dynamic_Execution_Control <p> Define some rules to manage dimensions and how the function works for some depths.</p>
          * @param Bool $Verification (Defaults to <b>False</b>.)<p> If set to TRUE the last element of the flat array will be a SHA3-256 string of the array values.</p>
-         * TODO:@param String $Dynamic_Execution_Control <p> Define some rules to manage and how the function works for some depths.</p>
          * @return array Returns an array or a multidimensional array of the last elements or an empty array on failure.
          */
-        Private Function Array_Recursively_Make_Flat_On_Go(array $Array, array &$Result = [], Int $Depth = 0, Int $MaxDepth = 5, Bool $Only_From_MaxDepth = False, Bool $Return_Max_With_Dimension = False, Bool $Flat_Un_dimensionalize = False, Bool $F_U_d_make_empty = False, Bool $Verification = False): array
+        Private Function Array_Recursively_Make_Flat_On_Go(array $Array, array &$Result = [], Int $Depth = 0, Int $MaxDepth = 5, Bool $Only_From_MaxDepth = False, Bool $Return_Max_With_Dimension = False, Bool $Flat_Un_dimensionalize = False, Bool $F_U_d_recursion_include_path = False, Bool $F_U_d_make_empty = False, Bool $Verification = False, Array $FUDArray = []): array
         {
             $Depth+=1;
             if($Depth > $MaxDepth)
             {
                 return [''];
             }
-            foreach($Array as $Entry)
+            foreach($Array as $Index=>$Entry)
             {
+                $Previous_Array = $FUDArray;
+                $Previous_Array[] = $Index;
                 if(is_array($Entry) === True)
                 {
                     if($Depth != $MaxDepth)
                     {
                         if($Flat_Un_dimensionalize === True)
                         {
-                            if((key($Entry) ?? False) !== False or $F_U_d_make_empty === True)
+                            if(($F_U_d_recursion_include_path === False) and (empty($Index) === False or $F_U_d_make_empty === True))
                             {
-                                $Result[] = (key($Entry) ?? '');
+                                $Result[] = (string)$Index;
                             }
                         }
-                        $this->Array_Recursively_Make_Flat_On_Go($Entry, $Result, $Depth, $MaxDepth, $Only_From_MaxDepth, $Return_Max_With_Dimension, $Flat_Un_dimensionalize, $F_U_d_make_empty, $Verification);
+                        $this->Array_Recursively_Make_Flat_On_Go($Entry, $Result, $Depth, $MaxDepth, $Only_From_MaxDepth, $Return_Max_With_Dimension, $Flat_Un_dimensionalize, $F_U_d_recursion_include_path, $F_U_d_make_empty, $Verification, $Previous_Array);
                     }elseif($Return_Max_With_Dimension === True)
                     {
                         $Result[] = $Entry;
@@ -182,11 +185,18 @@ namespace iZiTA
                     {
                         if((key($Entry) ?? False) !== False or $F_U_d_make_empty === True)
                         {
-                            $Result[] = (key($Entry) ?? '');
+                            $Result[] = ((string)key($Entry) ?? '');
                         }
                     }
                 }else
                 {
+                    if($Flat_Un_dimensionalize === True and $F_U_d_recursion_include_path === True)
+                    {
+                        foreach($Previous_Array as $F_U_d_include)
+                        {
+                            $Result[] = $F_U_d_include;
+                        }
+                    }
                     if(($Only_From_MaxDepth === True and $Depth === $MaxDepth) or $Only_From_MaxDepth === False or $Flat_Un_dimensionalize === True)
                     {
                         $Result[] = $Entry;
