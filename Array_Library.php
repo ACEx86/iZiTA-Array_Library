@@ -54,7 +54,7 @@ namespace iZiTA
          */
         Final Function Array_Get_Last(array $Array, Int $MaxDepth = 5, Bool $Only_From_MaxDepth = True, Bool $Flat_Un_dimensionalize = False, Bool $Verification = False): array
         {
-            $Array_To_Last = ($this->Array_Recursively_Make_On_Go($Array, MaxDepth: $MaxDepth, Only_From_MaxDepth: $Only_From_MaxDepth, Flat_Un_dimensionalize: $Flat_Un_dimensionalize, Verification: $Verification) ?? '') ?: '';
+            $Array_To_Last = ($this->Array_Recursively_Make_Flat_On_Go($Array, MaxDepth: $MaxDepth, Only_From_MaxDepth: $Only_From_MaxDepth, Flat_Un_dimensionalize: $Flat_Un_dimensionalize, Verification: $Verification) ?? '') ?: '';
             if(is_array($Array_To_Last) === True)
             {
                 return $Array_To_Last;
@@ -150,9 +150,11 @@ namespace iZiTA
          * @param Bool $Return_Max_With_Dimension (Defaults to <b>False</b>.)<p> When maximum depth is reached and more dimensions exist return them as last element.</p>
          * @param Bool $Flat_Un_dimensionalize (Defaults to <b>False</b>.)<p> Until maximum depth is reached make dimensions(array) flat array.</p>
          * @param Bool $F_U_d_make_empty (Defaults to <b>False</b>.)<p> If a dimension is empty include it.</p>
+         * @param Bool $Verification (Defaults to <b>False</b>.)<p> If set to TRUE the last element of the flat array will be a SHA3-256 string of the array values.</p>
+         * TODO:@param String $Dynamic_Execution_Control <p> Define some rules to manage and how the function works for some depths.</p>
          * @return array Returns an array or a multidimensional array of the last elements or an empty array on failure.
          */
-        Private Function Array_Recursively_Make_On_Go(array $Array, array &$Result = [], Int $Depth = 0, Int $MaxDepth = 5, Bool $Only_From_MaxDepth = False, Bool $Return_Max_With_Dimension = False, Bool $Flat_Un_dimensionalize = False, Bool $F_U_d_make_empty = False, Bool $Verification = False): array
+        Private Function Array_Recursively_Make_Flat_On_Go(array $Array, array &$Result = [], Int $Depth = 0, Int $MaxDepth = 5, Bool $Only_From_MaxDepth = False, Bool $Return_Max_With_Dimension = False, Bool $Flat_Un_dimensionalize = False, Bool $F_U_d_make_empty = False, Bool $Verification = False): array
         {
             $Depth+=1;
             if($Depth > $MaxDepth)
@@ -172,7 +174,7 @@ namespace iZiTA
                                 $Result[] = (key($Entry) ?? '');
                             }
                         }
-                        $this->Array_Recursively_Make_On_Go($Entry, $Result, $Depth, $MaxDepth, $Only_From_MaxDepth, $Return_Max_With_Dimension, $Flat_Un_dimensionalize, $F_U_d_make_empty);
+                        $this->Array_Recursively_Make_Flat_On_Go($Entry, $Result, $Depth, $MaxDepth, $Only_From_MaxDepth, $Return_Max_With_Dimension, $Flat_Un_dimensionalize, $F_U_d_make_empty, $Verification);
                     }elseif($Return_Max_With_Dimension === True)
                     {
                         $Result[] = $Entry;
