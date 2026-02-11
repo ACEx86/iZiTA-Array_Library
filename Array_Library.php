@@ -211,12 +211,9 @@ namespace iZiTA
                             $Result[] = (string)$Index;
                         }
                     }
-                    if(is_array($Entry) === True)
+                    if(is_array($Entry) === True and $Return_Max_With_Dimension === True)
                     {
-                        if($Return_Max_With_Dimension === True)
-                        {
-                            $Result[] = $Entry;
-                        }
+                        $Result[] = $Entry;
                     }elseif(is_string($Entry) === True)
                     {
                         $Result[] = $Entry;
