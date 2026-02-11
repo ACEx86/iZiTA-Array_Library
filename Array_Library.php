@@ -15,7 +15,7 @@ namespace iZiTA
     //</editor-fold>
     /**
      * iZiTA::Array_Library<br>
-     * Script version: <b>202602.0.0.23</b><br>
+     * Script version: <b>202602.0.0.24</b><br>
      * PHP Version: <b>8.5</b><br>
      * <b>Info</b>:<br>
      * iZiTA::Array_Library is an Array converting, checking library.<br>
@@ -44,7 +44,7 @@ namespace iZiTA
             return '';
         }
         /**
-         * Returns arrays last elements as flat array.
+         * Return arrays last elements as flat array.
          * @param array $Array<p> The array to process.</p>
          * @param Int $Max_Depth<p> The Maximum Depth to dive inside the array.<br>
          * <i>> Default to 5.</i></p>
@@ -52,9 +52,9 @@ namespace iZiTA
          * <i>> Defaults to True.</i></p>
          * @return array Returns an array of the last elements.
          */
-        Final Function Array_Get_Last(array $Array, Int $MaxDepth = 5, Bool $Only_From_MaxDepth = True, Bool $Flat_Un_dimensionalize = False): array
+        Final Function Array_Get_Last(array $Array, Int $MaxDepth = 5, Bool $Only_From_MaxDepth = True, Bool $Flat_Un_dimensionalize = False, Bool $Verification = False): array
         {
-            $Array_To_Last = ($this->Array_Recursively_Make_Until($Array, MaxDepth: $MaxDepth, Only_From_MaxDepth: $Only_From_MaxDepth, Flat_Un_dimensionalize: $Flat_Un_dimensionalize) ?? '') ?: '';
+            $Array_To_Last = ($this->Array_Recursively_Make_On_Go($Array, MaxDepth: $MaxDepth, Only_From_MaxDepth: $Only_From_MaxDepth, Flat_Un_dimensionalize: $Flat_Un_dimensionalize, Verification: $Verification) ?? '') ?: '';
             if(is_array($Array_To_Last) === True)
             {
                 return $Array_To_Last;
@@ -152,7 +152,7 @@ namespace iZiTA
          * @param Bool $F_U_d_make_empty (Defaults to <b>False</b>.)<p> If a dimension is empty include it.</p>
          * @return array Returns an array or a multidimensional array of the last elements or an empty array on failure.
          */
-        Private Function Array_Recursively_Make_Until(array $Array, array &$Result = [], Int $Depth = 0, Int $MaxDepth = 5, Bool $Only_From_MaxDepth = False, Bool $Return_Max_With_Dimension = False, Bool $Flat_Un_dimensionalize = False, Bool $F_U_d_make_empty = False): array
+        Private Function Array_Recursively_Make_On_Go(array $Array, array &$Result = [], Int $Depth = 0, Int $MaxDepth = 5, Bool $Only_From_MaxDepth = False, Bool $Return_Max_With_Dimension = False, Bool $Flat_Un_dimensionalize = False, Bool $F_U_d_make_empty = False, Bool $Verification = False): array
         {
             $Depth+=1;
             if($Depth > $MaxDepth)
@@ -172,7 +172,7 @@ namespace iZiTA
                                 $Result[] = (key($Entry) ?? '');
                             }
                         }
-                        $this->Array_Recursively_Make_Until($Entry, $Result, $Depth, $MaxDepth, $Only_From_MaxDepth, $Return_Max_With_Dimension, $Flat_Un_dimensionalize, $F_U_d_make_empty);
+                        $this->Array_Recursively_Make_On_Go($Entry, $Result, $Depth, $MaxDepth, $Only_From_MaxDepth, $Return_Max_With_Dimension, $Flat_Un_dimensionalize, $F_U_d_make_empty);
                     }elseif($Return_Max_With_Dimension === True)
                     {
                         $Result[] = $Entry;
@@ -190,6 +190,13 @@ namespace iZiTA
                         $Result[] = $Entry;
                     }
                 }
+            }
+            if($Verification === True)
+            {
+                $a = serialize($Result);
+                $Result[] = hash('sha3-256', $a);
+                $a = null;
+                unset($a);
             }
             return $Result;
         }
